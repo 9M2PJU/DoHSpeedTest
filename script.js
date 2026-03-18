@@ -755,12 +755,31 @@ function showRecommendationPopup() {
     modal.classList.remove('hidden');
 }
 
-// Modal closing logic for recommendModal
+// Modal management system
+const modalIds = ['recommendModal', 'websiteModal', 'dohModal'];
+
+function closeModal(id) {
+    document.getElementById(id)?.classList.add('hidden');
+}
+
+function openModal(id) {
+    document.getElementById(id)?.classList.remove('hidden');
+}
+
 document.addEventListener('click', function(e) {
-    const modal = document.getElementById('recommendModal');
-    if (e.target.classList.contains('close-recommend') || e.target === modal || (e.target.closest('.close') && e.target.closest('#recommendModal'))) {
-        modal.classList.add('hidden');
-    }
+    // Handling close buttons (X) and background clicks
+    modalIds.forEach(id => {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        
+        const isClickOutside = e.target === modal;
+        const isCloseBtn = e.target.classList.contains('close') && e.target.closest(`#${id}`);
+        const isActionBtn = e.target.classList.contains('close-recommend') || e.target.classList.contains('acknowledge-btn'); // For specific modal buttons
+
+        if (isClickOutside || isCloseBtn || isActionBtn) {
+            modal.classList.add('hidden');
+        }
+    });
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -810,7 +829,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Open the modal
     btn.onclick = function () {
-        modal.style.display = "block";
+        openModal("websiteModal");
         renderList();
     }
 
@@ -834,9 +853,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Close the modal
-    span.onclick = function () {
-        modal.style.display = "none";
-    }
+    // Handled by global listener
 
     // Add new website
     addBtn.onclick = function () {
@@ -855,11 +872,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Close the modal when clicking outside of it
-    window.onclick = function (event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    }
+    // Handled by global listener
 
 
     const dohModal = document.getElementById("dohModal");
@@ -898,13 +911,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     dohBtn.onclick = function () {
-        dohModal.style.display = "block";
+        openModal("dohModal");
         renderDoHList();
     };
 
-    closeDohBtn.onclick = function () {
-        dohModal.style.display = "none";
-    };
+    // Close buttons handled by global listener
 
     // Add new DoH server with automatic capability check
     addDoHBtn.onclick = function () {
@@ -926,11 +937,7 @@ document.addEventListener('DOMContentLoaded', function () {
         newDoHInput.value = ''; // Clear the input field
     };
 
-    window.onclick = function (event) {
-        if (event.target === dohModal) {
-            dohModal.style.display = "none";
-        }
-    };
+    // Handled by global listener
 
     // Function to check server capabilities for CORS and method support
     async function checkServerCapabilities(name, url) {
