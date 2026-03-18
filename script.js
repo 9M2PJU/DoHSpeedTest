@@ -63,9 +63,8 @@ function updateChartWithData(server) {
     const existingIndex = chartData.findIndex(item => item.name === server.name);
     const hasReliableSamples = server.reliability ? server.reliability.successCount > 0 : server.speed.avg !== 'Unavailable';
     
-    // Calculate jitter (standard deviation or simple range for visualization)
-    const validResults = server.individualResults?.filter(r => typeof r.speed === 'number').map(r => r.speed) || [];
-    const jitter = validResults.length > 1 ? Math.max(...validResults) - Math.min(...validResults) : 0;
+    // Use the pre-calculated jitter from server.speed
+    const jitter = typeof server.speed.jitter === 'number' ? server.speed.jitter : 0;
 
     const serverInfo = {
         name: server.name,
@@ -308,7 +307,7 @@ async function performDNSTests() {
 
 function calculateSpeedStats(results) {
     if (!results.length) {
-        return {min: 'Unavailable', median: 'Unavailable', max: 'Unavailable', avg: 'Unavailable'};
+        return {min: 'Unavailable', median: 'Unavailable', max: 'Unavailable', avg: 'Unavailable', jitter: 'Unavailable'};
     }
 
     const sorted = [...results].sort((a, b) => a - b);
@@ -318,8 +317,11 @@ function calculateSpeedStats(results) {
     const max = sorted[sorted.length - 1];
     const middleIndex = Math.floor(sorted.length / 2);
     const median = sorted.length % 2 === 0 ? (sorted[middleIndex - 1] + sorted[middleIndex]) / 2 : sorted[middleIndex];
+    
+    // Calculate jitter as the range (max - min) to show overall consistency
+    const jitter = max - min;
 
-    return {min, median, max, avg};
+    return {min, median, max, avg, jitter};
 }
 
 function buildReliabilityProfile(speedResults, totalQueries) {
