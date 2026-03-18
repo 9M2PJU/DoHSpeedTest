@@ -23,109 +23,56 @@ const topWebsites = ['google.com', 'youtube.com', 'facebook.com', 'instagram.com
 // Penalize failed/timeout requests so they don't skew averages in favor of unstable servers
 const TIMEOUT_PENALTY_MS = 5000;
 // Global variable to store chart instance
-const dnsServers = [{
-    name: "AdGuard", url: "https://dns.adguard-dns.com/dns-query", ips: ["94.140.14.14", "94.140.15.15"]
-}, {
-    name: "AliDNS", url: "https://dns.alidns.com/dns-query", ips: ["223.5.5.5", "223.6.6.6"]
-}, {
-    name: "OpenDNS", url: "https://doh.opendns.com/dns-query", ips: ["208.67.222.222", "208.67.220.220"]
-}, {
-    name: "CleanBrowsing",
-    url: "https://doh.cleanbrowsing.org/doh/family-filter/",
-    ips: ["185.228.168.9", "185.228.169.9"]
-}, {
-    name: "Cloudflare",
-    url: "https://cloudflare-dns.com/dns-query",
-    type: "get",
-    allowCors: true,
-    ips: ["1.1.1.1", "1.0.0.1"]
-}, {
-    name: "ControlD", url: "https://freedns.controld.com/p0", ips: ["76.76.2.0", "76.223.122.150"]
-}, {
-    name: "DNS.SB",
-    url: "https://doh.dns.sb/dns-query",
-    type: "get",
-    allowCors: true,
-    ips: ["185.222.222.222", "45.11.45.11"]
-}, {
-    name: "DNSPod",
-    url: "https://dns.pub/dns-query",
-    type: "post",
-    allowCors: false,
-    ips: ["119.29.29.29", "182.254.116.116"]
-}, {
-    name: "Google", url: "https://dns.google/resolve", type: "get", allowCors: true, ips: ["8.8.8.8", "8.8.4.4"]
-}, {
-    name: "Mullvad", url: "https://dns.mullvad.net/dns-query", ips: ["194.242.2.2", "194.242.2.2"], type: "get", allowCors: false
-}, {
-    name: "Mullvad Base", url: "https://base.dns.mullvad.net/dns-query", ips: ["194.242.2.4", "194.242.2.4"], type: "get", allowCors: false
-}, {
-    name: "NextDNS", url: "https://dns.nextdns.io", type: "get", ips: ["45.90.28.0", "45.90.30.0"]
-}, {
-    name: "OpenBLD", url: "https://ada.openbld.net/dns-query", ips: ["146.112.41.2", "146.112.41.102"], allowCors: false
-}, {
-    name: "DNS4EU", url: "https://unfiltered.joindns4.eu/dns-query", ips: ["86.54.11.100", "86.54.11.200"],
-    type: "post",
-    allowCors: false,
-}, {
-    name: "Quad9", url: "https://dns.quad9.net/dns-query", ips: ["9.9.9.9", "149.112.112.112"]
-}, {
-    name: "360", url: "https://doh.360.cn/dns-query", ips: ["101.226.4.6", "180.163.224.54"]
-}, {
-    name: "Canadian Shield",
-    url: "https://private.canadianshield.cira.ca/dns-query",
-    ips: ["149.112.121.10", "149.112.122.10"]
-}, {
-    name: "Digitale Gesellschaft",
-    url: "https://dns.digitale-gesellschaft.ch/dns-query",
-    ips: ["185.95.218.42", "185.95.218.43"]
-}, {
-    name: "DNS for Family", url: "https://dns-doh.dnsforfamily.com/dns-query", ips: ["94.130.180.225", "78.47.64.161"]
-}, {
-    name: "Restena", url: "https://dnspub.restena.lu/dns-query", ips: ["158.64.1.29"]
-}, {
-    name: "IIJ", url: "https://public.dns.iij.jp/dns-query", ips: ["203.180.164.45", "203.180.166.45"]
-}, {
-    name: "LibreDNS", url: "https://doh.libredns.gr/dns-query", ips: ["116.202.176.26", "147.135.76.183"]
-}, {
-    name: "Switch", url: "https://dns.switch.ch/dns-query", ips: ["130.59.31.248", "130.59.31.251"]
-}, {
-    name: "Foundation for Applied Privacy", url: "https://doh.applied-privacy.net/query", ips: ["146.255.56.98"],
-}, {
-    name: "UncensoredDNS", url: "https://anycast.uncensoreddns.org/dns-query", ips: ["91.239.100.100", "89.233.43.71"]
-}, {
-    name: "RethinkDNS",
-    url: "https://sky.rethinkdns.com/dns-query",
-    ips: ["104.21.83.62", "172.67.214.246"],
-    allowCors: false,
-}, {
-    name: "FlashStart (registration required)",
-    url: "https://doh.flashstart.com/f17c9ee5",
-    type: "post",
-    allowCors: false,
-    ips: ["185.236.104.104"]
-}, {
-        name: "Comcast Xfinity",
-        url: "https://doh.xfinity.com/dns-query",
-        type: "get",
-        allowCors: false,
-        ips: ["75.75.75.75", "75.75.76.76"]
-    }
+const dnsServers = [
+    { name: "AdGuard", url: "https://dns.adguard-dns.com/dns-query", ips: ["94.140.14.14", "94.140.15.15"] },
+    { name: "AliDNS", url: "https://dns.alidns.com/dns-query", ips: ["223.5.5.5", "223.6.6.6"] },
+    { name: "OpenDNS", url: "https://doh.opendns.com/dns-query", ips: ["208.67.222.222", "208.67.220.220"] },
+    { name: "CleanBrowsing", url: "https://doh.cleanbrowsing.org/doh/family-filter/", ips: ["185.228.168.9", "185.228.169.9"] },
+    { name: "Cloudflare", url: "https://cloudflare-dns.com/dns-query", type: "get", allowCors: true, ips: ["1.1.1.1", "1.0.0.1"] },
+    { name: "ControlD", url: "https://freedns.controld.com/p0", ips: ["76.76.2.0", "76.223.122.150"] },
+    { name: "DNS.SB", url: "https://doh.dns.sb/dns-query", type: "get", allowCors: true, ips: ["185.222.222.222", "45.11.45.11"] },
+    { name: "DNSPod", url: "https://dns.pub/dns-query", type: "post", allowCors: false, ips: ["119.29.29.29", "182.254.116.116"] },
+    { name: "Google", url: "https://dns.google/resolve", type: "get", allowCors: true, ips: ["8.8.8.8", "8.8.4.4"] },
+    { name: "Mullvad", url: "https://dns.mullvad.net/dns-query", ips: ["194.242.2.2"], type: "get", allowCors: false },
+    { name: "NextDNS", url: "https://dns.nextdns.io", type: "get", ips: ["45.90.28.0", "45.90.30.0"] },
+    { name: "Quad9", url: "https://dns.quad9.net/dns-query", ips: ["9.9.9.9", "149.112.112.112"] },
+    { name: "RethinkDNS", url: "https://sky.rethinkdns.com/dns-query", ips: ["104.21.83.62"], allowCors: false },
+    { name: "Comcast Xfinity", url: "https://doh.xfinity.com/dns-query", type: "get", allowCors: false, ips: ["75.75.75.75"] },
+    { name: "DNS.WATCH", url: "https://resolver2.dns.watch/dns-query", ips: ["84.200.69.80", "84.200.70.40"] },
+    { name: "Cisco Umbrella", url: "https://doh.umbrella.com/dns-query", ips: ["208.67.222.222"] },
+    { name: "Neustar", url: "https://doh.neustar.biz/dns-query", ips: ["156.154.70.2", "156.154.71.2"] },
+    { name: "Freenom World", url: "https://doh.freenom.com/dns-query", ips: ["80.80.80.80", "80.80.81.81"] },
+    { name: "DNS4EU", url: "https://unfiltered.joindns4.eu/dns-query", ips: ["86.54.11.100"], type: "post", allowCors: false },
+    { name: "Verisign", url: "https://doh.verisign-dns.com/dns-query", ips: ["64.6.64.6", "64.6.65.6"] },
+    { name: "Yandex DNS", url: "https://doh.yandex.net/dns-query", ips: ["77.8.8.8"] },
+    { name: "360 DNS", url: "https://doh.360.cn/dns-query", ips: ["101.226.4.6"] },
+    { name: "AhaDNS", url: "https://doh.ahadns.com/dns-query", ips: ["45.67.219.208"] },
+    { name: "BlahDNS", url: "https://doh.blahdns.com/dns-query", ips: ["159.69.198.101"] },
+    { name: "deSEC", url: "https://desec.io/dns-query", ips: ["45.54.76.1"] },
+    { name: "FlashStart", url: "https://doh.flashstart.com/f17c9ee5", ips: ["185.236.104.104"] },
+    { name: "Gcore", url: "https://doh.gcore.com/dns-query", ips: ["95.161.180.1"] },
+    { name: "LibreDNS", url: "https://doh.libredns.gr/dns-query", ips: ["116.202.176.26"] },
+    { name: "SafeDNS", url: "https://doh.safedns.com/dns-query", ips: ["195.46.39.39"] },
+    { name: "Switch", url: "https://dns.switch.ch/dns-query", ips: ["130.59.31.248"] }
 ];
 
-let dnsChart;
-
+let dnsChart, jitterChart;
 let chartData = [];
 
 function updateChartWithData(server) {
-    // Store server data for chart updates
     const existingIndex = chartData.findIndex(item => item.name === server.name);
     const hasReliableSamples = server.reliability ? server.reliability.successCount > 0 : server.speed.avg !== 'Unavailable';
+    
+    // Calculate jitter (standard deviation or simple range for visualization)
+    const validResults = server.individualResults?.filter(r => typeof r.speed === 'number').map(r => r.speed) || [];
+    const jitter = validResults.length > 1 ? Math.max(...validResults) - Math.min(...validResults) : 0;
+
     const serverInfo = {
         name: server.name,
         avg: hasReliableSamples && typeof server.speed.avg === 'number' ? server.speed.avg : null,
         min: hasReliableSamples && typeof server.speed.min === 'number' ? server.speed.min : null,
-        max: hasReliableSamples && typeof server.speed.max === 'number' ? server.speed.max : null
+        max: hasReliableSamples && typeof server.speed.max === 'number' ? server.speed.max : null,
+        jitter: jitter
     };
 
     if (existingIndex === -1) {
@@ -134,124 +81,105 @@ function updateChartWithData(server) {
         chartData[existingIndex] = serverInfo;
     }
 
-    // Update chart when we have valid data
-    updateChart();
+    updateCharts();
 }
 
-function updateChart() {
-    const chartContainer = document.getElementById('chartContainer');
-    const canvas = document.getElementById('dnsChart');
-    const ctx = canvas.getContext('2d');
-    
-    // Filter valid data and sort by average response time (ascending - fastest first)
+function updateCharts() {
+    const chartSection = document.getElementById('chartSection');
     const validData = chartData.filter(item => item.avg !== null).sort((a, b) => a.avg - b.avg);
     
     if (validData.length === 0) return;
+    chartSection.classList.remove('hidden');
 
-    // Calculate dynamic height based on number of servers (35px per server + padding)
-    const minHeight = 300;
-    const maxHeight = 800;
-    const heightPerServer = 35;
-    const dynamicHeight = Math.max(minHeight, Math.min(maxHeight, validData.length * heightPerServer + 100));
+    updateLatencyChart(validData);
+    updateJitterChart(validData);
+}
+
+function updateLatencyChart(validData) {
+    const canvas = document.getElementById('dnsChart');
+    const ctx = canvas.getContext('2d');
     
-    // Update container height
-    const container = chartContainer.querySelector('.chart-container');
-    container.style.height = `${dynamicHeight}px`;
+    if (dnsChart) dnsChart.destroy();
 
-    // Show chart container
-    chartContainer.classList.remove('hidden');
-
-    // Destroy existing chart if it exists
-    if (dnsChart) {
-        dnsChart.destroy();
-    }
-
-    // Calculate scale range to ensure all bars are visually meaningful
-    const minValue = Math.min(...validData.map(item => item.avg));
-    const maxValue = Math.max(...validData.map(item => item.avg));
-    const range = maxValue - minValue;
-    
-    // Use a more aggressive approach: start from 70% of minimum value
-    // This ensures the fastest server still gets at least 30% bar length
-    const scaleMin = Math.max(0, minValue * 0.7);
-
-    // Create horizontal bar chart
     dnsChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: validData.map(item => item.name),
+            labels: validData.slice(0, 10).map(item => item.name),
             datasets: [{
-                label: 'Average Response Time (ms)',
-                data: validData.map(item => item.avg),
-                backgroundColor: validData.map(item => getPerformanceColor(item.avg, validData)),
-                borderColor: validData.map(item => getPerformanceColor(item.avg, validData, true)),
-                borderWidth: 1
+                label: 'Average Latency (ms)',
+                data: validData.slice(0, 10).map(item => item.avg),
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: '#3b82f6',
+                borderWidth: 2,
+                borderRadius: 8
             }]
         },
         options: {
-            indexAxis: 'y', // Horizontal bars
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: 'index'
-            },
             plugins: {
-                legend: {
-                    display: false // Hide legend for cleaner look
-                },
+                legend: { display: false },
                 tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const server = validData[context.dataIndex];
-                            return [
-                                `Average: ${server.avg.toFixed(2)}ms`,
-                                `Min: ${server.min?.toFixed(2) || 'N/A'}ms`,
-                                `Max: ${server.max?.toFixed(2) || 'N/A'}ms`
-                            ];
-                        }
-                    }
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    padding: 12,
+                    bodyFont: { size: 14 }
                 }
             },
             scales: {
                 x: {
-                    min: scaleMin,
-                    title: {
-                        display: true,
-                        text: 'Response Time (ms)'
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            return value.toFixed(0) + 'ms';
-                        }
-                    }
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#94a3b8' }
                 },
                 y: {
-                    title: {
-                        display: window.innerWidth >= 768,
-                        text: 'DNS Servers (Slowest → Fastest)'
-                    },
-                    ticks: {
-                        maxRotation: 0,
-                        font: {
-                            size: 11
-                        }
-                    },
-                    categoryPercentage: 0.8,
-                    barPercentage: 0.6
+                    grid: { display: false },
+                    ticks: { color: '#f8fafc', font: { weight: '500' } }
+                }
+            }
+        }
+    });
+}
+
+function updateJitterChart(validData) {
+    const canvas = document.getElementById('dnsJitterChart');
+    const ctx = canvas.getContext('2d');
+    
+    if (jitterChart) jitterChart.destroy();
+
+    const jitterData = [...validData].sort((a, b) => a.jitter - b.jitter).slice(0, 10);
+
+    jitterChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: jitterData.map(item => item.name),
+            datasets: [{
+                label: 'Jitter (Max-Min ms)',
+                data: jitterData.map(item => item.jitter),
+                backgroundColor: 'rgba(168, 85, 247, 0.5)',
+                borderColor: '#a855f7',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    padding: 12
                 }
             },
-            elements: {
-                bar: {
-                    borderWidth: 1
-                }
-            },
-            layout: {
-                padding: {
-                    left: 20,
-                    right: 20,
-                    top: 15,
-                    bottom: 15
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#94a3b8' }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { color: '#f8fafc', font: { weight: '500' } }
                 }
             }
         }
@@ -311,32 +239,27 @@ async function warmUpDNSServers() {
 }
 
 async function updateLoadingMessage(message) {
-    document.getElementById('loadingMessage').innerHTML = `${message} <div class="spinner">
-        <div class="dot dot-1"></div>
-        <div class="dot dot-2"></div>
-        <div class="dot dot-3"></div>
-    </div>`;
+    document.getElementById('loadingMessage').innerHTML = `<span>${message}</span> <div class="flex gap-1"><div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div></div>`;
 }
 
 checkButton.addEventListener('click', async function () {
     this.disabled = true;
-    editButton.disabled = true; // Disable the Edit button
-    document.getElementById('editDoHButton').disabled = true; // Disable the DoH Edit button
+    editButton.disabled = true;
+    document.getElementById('editDoHButton').disabled = true;
     document.getElementById('loadingMessage').classList.remove('hidden');
     
-    // Clear previous chart data
     chartData = [];
-    document.getElementById('chartContainer').classList.add('hidden');
+    document.getElementById('chartSection').classList.add('hidden');
 
-    await updateLoadingMessage('Warming up DNS servers');
+    await updateLoadingMessage('Initializing Warm-up Phase');
     await warmUpDNSServers();
-    await updateLoadingMessage('Analyzing DNS servers');
+    await updateLoadingMessage('Benchmarking Network Latency');
     await performDNSTests();
 
     document.getElementById('loadingMessage').classList.add('hidden');
     this.disabled = false;
-    editButton.disabled = false; // Re-enable the Edit button
-    document.getElementById('editDoHButton').disabled = false; // Re-enable the DoH Edit button
+    editButton.disabled = false;
+    document.getElementById('editDoHButton').disabled = false;
 });
 
 async function performDNSTests() {
@@ -570,65 +493,62 @@ function updateResult(server) {
     let row = document.querySelector(`tr[data-server-name="${server.name}"]`);
     let detailsRow;
     const reliabilityBadge = getReliabilityBadge(server.reliability);
-    const reliabilityDetails = server.reliability && server.reliability.message ? `<div class="mt-2 text-sm text-gray-600 dark:text-gray-400">${server.reliability.message}</div>` : '';
+    const reliabilityDetails = server.reliability && server.reliability.message ? `<div class="mt-2 text-sm text-slate-400">${server.reliability.message}</div>` : '';
     const minValue = formatMetric(server.speed.min);
     const medianValue = formatMetric(server.speed.median);
     const avgValue = formatMetric(server.speed.avg);
     const maxValue = formatMetric(server.speed.max);
+    const jitterValue = formatMetric(server.speed.jitter);
 
     if (!row) {
         row = document.createElement('tr');
         row.setAttribute('data-server-name', server.name);
-        row.classList.add('border-b', 'border-gray-300', 'hover:bg-gray-200', 'dark:border-gray-600', 'dark:hover:bg-gray-700');
+        row.className = 'group transition-all duration-300';
         table.appendChild(row);
 
-        // Create a new row for detailed information
         detailsRow = document.createElement('tr');
-        detailsRow.classList.add('details-row', 'hidden', 'border-b', 'border-gray-300', 'hover:bg-gray-200', 'dark:border-gray-600', 'dark:hover:bg-gray-700'); // Hide by default
+        detailsRow.className = 'details-row hidden';
         table.appendChild(detailsRow);
     } else {
-        // If the row already exists, get the next row as the details row
         detailsRow = row.nextElementSibling;
     }
 
-    // Update row with basic information
-        row.innerHTML = `
-        <td class="text-left py-2 px-4 dark:text-gray-300">${server.name} 
-        <span class="cursor-pointer ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded flex items-center gap-1 transition-all duration-200 hover:-translate-y-0.5 select-none inline-flex" onclick="copyToClipboard('DoH Server URL: ${server.url}' + '\\n' + 'IP Addresses: ${server.ips.join(', ')}', this)" title="Copy server details">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-            </svg>
-            Copy
-        </span>
-        ${reliabilityBadge}
+    row.innerHTML = `
+        <td class="text-left py-4 px-6">
+            <div class="flex flex-col gap-1">
+                <div class="flex items-center gap-3">
+                    <span class="font-semibold text-white/90">${server.name}</span>
+                    <button class="p-1.5 bg-white/5 hover:bg-white/10 rounded-lg transition-all opacity-0 group-hover:opacity-100" onclick="copyToClipboard('DoH Server URL: ${server.url}' + '\\n' + 'IP Addresses: ${server.ips.join(', ')}', this)" title="Copy details">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="text-slate-400"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                    </button>
+                </div>
+                ${reliabilityBadge}
+            </div>
         </td>
-        <td class="text-center py-2 px-4 dark:text-gray-300">${minValue}</td>
-        <td class="text-center py-2 px-4 dark:text-gray-300">${medianValue}</td>
-        <td class="text-center py-2 px-4 dark:text-gray-300">${avgValue}</td>
-        <td class="text-center py-2 px-4 dark:text-gray-300">${maxValue}</td>
+        <td class="text-center py-4 px-6 font-medium text-slate-300">${minValue}</td>
+        <td class="text-center py-4 px-6 font-medium text-slate-300">${medianValue}</td>
+        <td class="text-center py-4 px-6 font-bold text-blue-400">${avgValue}</td>
+        <td class="text-center py-4 px-6 font-medium text-slate-300">${maxValue}</td>
+        <td class="text-center py-4 px-6 font-medium text-slate-300">${jitterValue}</td>
     `;
 
-    // Populate the detailed view with timings for each hostname
     detailsRow.innerHTML = `
-    <td colspan="5" class="py-2 px-4 dark:bg-gray-800 dark:text-gray-300">
-        ${reliabilityDetails}
-        <div>Timings for each hostname:</div>
-        <ul>
-            ${server.individualResults.map(result => {
-        if (typeof result.speed === 'number') {
-            return `<li>${result.website}: ${result.speed.toFixed(2)} ms</li>`;
-        } else {
-            return `<li>${result.website}: Unavailable</li>`;
-        }
-    }).join('')}
-        </ul>
-    </td>
-`;
-
-    // Add click event listener to toggle detailed view
-    // row.addEventListener('click', function() {
-    //     detailsRow.classList.toggle('hidden');
-    // });
+        <td colspan="7" class="py-6 px-8 bg-blue-500/5 rounded-b-2xl">
+            <div class="max-w-3xl">
+                ${reliabilityDetails}
+                <div class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                    ${server.individualResults.map(result => `
+                        <div class="flex justify-between items-center bg-white/5 p-2 px-3 rounded-lg border border-white/5">
+                            <span class="text-sm text-slate-400">${result.website}</span>
+                            <span class="text-sm font-mono ${typeof result.speed === 'number' ? 'text-emerald-400' : 'text-red-400'}">
+                                ${typeof result.speed === 'number' ? result.speed.toFixed(1) + 'ms' : 'Error'}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </td>
+    `;
 
     updateChartWithData(server);
 }
@@ -638,28 +558,13 @@ function formatMetric(value) {
 }
 
 function getReliabilityBadge(reliability) {
-    if (!reliability) {
-        return '';
-    }
+    if (!reliability) return '';
 
-    const escapedMessage = reliability.message ? reliability.message.replace(/"/g, '&quot;') : '';
     const badgeConfig = {
-        healthy: {
-            label: 'Stable',
-            classes: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-        },
-        partial: {
-            label: 'Partial',
-            classes: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-        },
-        failed: {
-            label: 'Unreachable',
-            classes: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-        },
-        'no-data': {
-            label: 'No data',
-            classes: 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200'
-        }
+        healthy: { label: 'Stable', classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+        partial: { label: 'Partial', classes: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
+        failed: { label: 'Unreachable', classes: 'bg-red-500/10 text-red-400 border-red-500/20' },
+        'no-data': { label: 'No data', classes: 'bg-slate-500/10 text-slate-400 border-slate-500/20' }
     };
 
     const config = badgeConfig[reliability.status] || badgeConfig['no-data'];
@@ -667,7 +572,7 @@ function getReliabilityBadge(reliability) {
 
     return `
         <div class="mt-1">
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${config.classes}" title="${escapedMessage}">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-bold border ${config.classes}">
                 ${config.label}${ratioText}
             </span>
         </div>
@@ -811,16 +716,16 @@ document.addEventListener('DOMContentLoaded', function () {
         list.innerHTML = '';
         topWebsites.forEach((site, index) => {
             const li = document.createElement("li");
-            // Updated class list to include border-bottom for better separation
-            li.className = 'px-2 py-1 mb-1 bg-gray-200 rounded flex justify-between items-center border-b border-gray-300 dark:bg-gray-700 dark:border-gray-600';
+            li.className = 'px-4 py-3 bg-white/5 rounded-xl flex justify-between items-center border border-white/5 group hover:bg-white/10 transition-colors';
 
             const siteText = document.createElement("span");
+            siteText.className = 'text-slate-300 font-medium';
             siteText.textContent = site;
-            li.appendChild(siteText);  // Properly append the text content to the list item
+            li.appendChild(siteText);
 
             const removeBtn = document.createElement("button");
-            removeBtn.className = 'bg-red-500 text-white rounded px-2 py-1 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800';
-            removeBtn.textContent = 'Delete';
+            removeBtn.className = 'text-slate-500 hover:text-red-400 p-2 transition-colors opacity-0 group-hover:opacity-100';
+            removeBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>';
             removeBtn.onclick = function () {
                 topWebsites.splice(index, 1);
                 renderList();
@@ -829,7 +734,6 @@ document.addEventListener('DOMContentLoaded', function () {
             li.appendChild(removeBtn);
             list.appendChild(li);
         });
-        // Disable the checkButton if topWebsites is empty
         checkButton.disabled = topWebsites.length === 0;
     }
 
@@ -899,15 +803,19 @@ document.addEventListener('DOMContentLoaded', function () {
         dohList.innerHTML = '';
         dnsServers.forEach((server, index) => {
             const li = document.createElement("li");
-            li.className = 'px-2 py-1 mb-1 bg-gray-200 rounded flex justify-between items-center border-b border-gray-300 dark:bg-gray-700 dark:border-gray-600';
+            li.className = 'px-4 py-3 bg-white/5 rounded-xl flex justify-between items-center border border-white/5 group hover:bg-white/10 transition-colors';
 
-            const serverText = document.createElement("span");
-            serverText.textContent = `${server.name}: ${server.url}`;
-            li.appendChild(serverText);
+            const serverInfo = document.createElement("div");
+            serverInfo.className = 'flex flex-col';
+            serverInfo.innerHTML = `
+                <span class="text-white/90 font-semibold text-sm">${server.name}</span>
+                <span class="text-slate-500 text-xs truncate max-w-[300px]">${server.url}</span>
+            `;
+            li.appendChild(serverInfo);
 
             const removeBtn = document.createElement("button");
-            removeBtn.className = 'bg-red-500 text-white rounded px-2 py-1 ml-2 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800';
-            removeBtn.textContent = 'Delete';
+            removeBtn.className = 'text-slate-500 hover:text-red-400 p-2 transition-colors opacity-0 group-hover:opacity-100';
+            removeBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>';
             removeBtn.onclick = function () {
                 dnsServers.splice(index, 1);
                 renderDoHList();

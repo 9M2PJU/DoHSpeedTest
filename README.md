@@ -1,12 +1,11 @@
 # DNS Speed Test
 
 Welcome to the **DNS Speed Test** tool! This innovative web application, accessible
-at [https://dnsspeedtest.online/](https://dnsspeedtest.online/), is uniquely engineered to optimize your internet
+at [https://dns.hamradio.my/](https://dns.hamradio.my/), is uniquely engineered to optimize your internet
 experience by identifying the fastest DNS server tailored to your specific location. In an era where internet speed is
-crucial, our tool stands out by performing real-time DNS server evaluations directly from your browser. It's not just
-about finding the fastest DNS; it's about ensuring a secure and efficient browsing experience. By leveraging the power
-of DNS over HTTPS (DoH) in a client-side application, we offer an unparalleled combination of speed, security, and
-user-centric design. Dive into an enhanced internet experience where performance and privacy go hand in hand.
+crucial, our tool stands out by performing real-time DNS server evaluations directly from your browser.
+
+Featuring a **Premium Redesign**, we've enhanced the UI with modern aesthetics, glassmorphism, and advanced data visualizations including **Latency Benchmarks** and **Jitter Analysis**.
 
 ## 🚀 Introduction
 
@@ -16,9 +15,11 @@ solution for achieving a faster and more reliable internet connection by testing
 ## 💡 Features
 
 - **Real-time DNS Testing**: Pinpoints the fastest DNS server based on real-time data for your location.
+- **Premium UI/UX**: Modern glassmorphism design with smooth animations and dark mode support.
+- **Expanded DNS Database**: Pre-configured with 30+ major DoH providers (Cloudflare, Google, Quad9, AdGuard, etc.).
+- **Advanced Jitter Analysis**: New chart to measure connection consistency and stability.
 - **Customizable Tests**: Tailor your testing by adding or removing websites.
 - **Detailed Analytics**: Gain deep insights with min, median, and max response times.
-- **Interactive Data Visualization**: Charts and graphs for clear, engaging data representation.
 - **Adaptive Design**: Seamless experience across different devices.
 - **Absolutely Free**: Full access to all features without any cost.
 
