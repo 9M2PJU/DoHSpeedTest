@@ -18,8 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with DoHSpeedTest. If not, see <http://www.gnu.org/licenses/>.
  */
-const checkButton = document.getElementById('checkButton');
-const editButton = document.getElementById('editButton');
+// Global variables for DNS testing
 const topWebsites = ['google.com', 'youtube.com', 'facebook.com', 'instagram.com', 'chatgpt.com', 'x.com', 'whatsapp.com', 'reddit.com', 'wikipedia.org', 'amazon.com', 'tiktok.com', 'pinterest.com'];
 // Penalize failed/timeout requests so they don't skew averages in favor of unstable servers
 const TIMEOUT_PENALTY_MS = 5000;
@@ -242,11 +241,18 @@ async function updateLoadingMessage(message) {
     document.getElementById('loadingMessage').innerHTML = `<span>${message}</span> <div class="flex gap-1"><div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><div class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div></div>`;
 }
 
-checkButton.addEventListener('click', async function () {
-    this.disabled = true;
-    editButton.disabled = true;
-    document.getElementById('editDoHButton').disabled = true;
-    document.getElementById('loadingMessage').classList.remove('hidden');
+// Event listeners attached within DOMContentLoaded to ensure elements are present
+document.addEventListener('DOMContentLoaded', function () {
+    const checkButton = document.getElementById('checkButton');
+    const editButton = document.getElementById('editButton');
+    const editDoHButton = document.getElementById('editDoHButton');
+
+    if (checkButton) {
+        checkButton.addEventListener('click', async function () {
+            this.disabled = true;
+            if (editButton) editButton.disabled = true;
+            if (editDoHButton) editDoHButton.disabled = true;
+            document.getElementById('loadingMessage').classList.remove('hidden');
     
     chartData = [];
     const chartSection = document.getElementById('chartSection');
@@ -263,13 +269,13 @@ checkButton.addEventListener('click', async function () {
 
     document.getElementById('loadingMessage').classList.add('hidden');
     this.disabled = false;
-    editButton.disabled = false;
-    document.getElementById('editDoHButton').disabled = false;
-
-    // Show recommendations after completion
-    showRecommendationPopup();
+            // Show recommendations after completion
+            showRecommendationPopup();
+        });
+    }
 });
 
+// Original logic below remains mostly unchanged, now safer within its block
 async function performDNSTests() {
 
     const totalQueries = topWebsites.length;
@@ -677,17 +683,21 @@ function copyToClipboard(text, buttonElement) {
     });
 }
 
-document.getElementById('cta').addEventListener('click', function () {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Find the Fastest DNS Server for You',
-            text: 'Check out this tool to find the fastest DNS server for your location!',
-            url: window.location.href
-        }).then(() => {
-            console.log('Thanks for sharing!');
-        }).catch(console.error);
-    }
-});
+// Optional share functionality on the title (safely handle if missing)
+const cta = document.getElementById('cta');
+if (cta) {
+    cta.addEventListener('click', function () {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Find the Fastest DNS Server for You',
+                text: 'Check out this tool to find the fastest DNS server for your location!',
+                url: window.location.href
+            }).then(() => {
+                console.log('Thanks for sharing!');
+            }).catch(console.error);
+        }
+    });
+}
 
 // Add this at the top of your script, after the global variable declarations
 window.addEventListener('resize', function () {
