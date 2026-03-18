@@ -285,7 +285,7 @@ async function performDNSTests() {
         });
 
         if (totalQueries === 0) {
-            server.speed = {min: 'Unavailable', median: 'Unavailable', max: 'Unavailable', avg: 'Unavailable'};
+            server.speed = {min: 'Unavailable', median: 'Unavailable', max: 'Unavailable', avg: 'Unavailable', jitter: 'Unavailable'};
             server.reliability = {
                 status: 'no-data',
                 successCount: 0,
