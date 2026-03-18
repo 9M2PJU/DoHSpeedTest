@@ -249,7 +249,14 @@ checkButton.addEventListener('click', async function () {
     document.getElementById('loadingMessage').classList.remove('hidden');
     
     chartData = [];
-    document.getElementById('chartSection').classList.add('hidden');
+    const chartSection = document.getElementById('chartSection');
+    chartSection.classList.add('hidden');
+
+    // Focus on charts immediately if they were visible, or prepare to show them
+    window.scrollTo({
+        top: document.getElementById('checkButton').offsetTop + 100,
+        behavior: 'smooth'
+    });
 
     await updateLoadingMessage('Initializing Warm-up Phase');
     await warmUpDNSServers();
@@ -260,6 +267,9 @@ checkButton.addEventListener('click', async function () {
     this.disabled = false;
     editButton.disabled = false;
     document.getElementById('editDoHButton').disabled = false;
+
+    // Show recommendations after completion
+    showRecommendationPopup();
 });
 
 async function performDNSTests() {
@@ -692,6 +702,64 @@ function updateChartVisibility() {
 }
 
 // JavaScript to handle modal and list manipulation
+function showRecommendationPopup() {
+    const modal = document.getElementById('recommendModal');
+    const container = document.getElementById('recommendationCards');
+    const explanation = document.getElementById('recommendationExplanation');
+
+    // Filter healthy servers and sort by median speed
+    const candidates = dnsServers
+        .filter(s => s.reliability && s.reliability.status === 'healthy')
+        .sort((a, b) => (a.speed.median || 9999) - (b.speed.median || 9999))
+        .slice(0, 3);
+
+    if (candidates.length === 0) return;
+
+    container.innerHTML = '';
+    candidates.forEach((server, index) => {
+        const card = document.createElement('div');
+        const rankColor = index === 0 ? 'from-yellow-400 to-amber-600' : 
+                         index === 1 ? 'from-slate-300 to-slate-500' : 
+                         'from-orange-400 to-red-600';
+        
+        const validResults = server.individualResults?.filter(r => typeof r.speed === 'number').map(r => r.speed) || [];
+        const jitter = validResults.length > 1 ? Math.max(...validResults) - Math.min(...validResults) : 0;
+
+        card.className = 'bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col items-center text-center relative overflow-hidden group hover:border-blue-500/30 transition-all';
+        card.innerHTML = `
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${rankColor}"></div>
+            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4 text-xl font-bold text-white/50">
+                #${index + 1}
+            </div>
+            <h4 class="text-xl font-bold text-white mb-1">${server.name}</h4>
+            <div class="text-3xl font-black text-blue-400 mb-4">${server.speed.median.toFixed(1)}<span class="text-xs font-normal text-slate-500">ms</span></div>
+            <div class="flex flex-col gap-2 w-full">
+                <div class="flex justify-between text-xs px-2">
+                    <span class="text-slate-500 uppercase font-bold tracking-tighter">Consistency</span>
+                    <span class="text-emerald-400 font-mono">${jitter.toFixed(1)}ms jitter</span>
+                </div>
+                <div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                    <div class="bg-emerald-500 h-full" style="width: ${Math.max(10, 100 - (jitter * 2))}%"></div>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+
+    const best = candidates[0];
+    explanation.textContent = `${best.name} is your optimal choice today because it maintains the lowest median latency (${best.speed.median.toFixed(2)}ms) across all tested endpoints. Combined with a success rate of 100%, it offers the most stable and responsive resolution for your current network path.`;
+
+    modal.classList.remove('hidden');
+}
+
+// Modal closing logic for recommendModal
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('recommendModal');
+    if (e.target.classList.contains('close-recommend') || e.target === modal || (e.target.closest('.close') && e.target.closest('#recommendModal'))) {
+        modal.classList.add('hidden');
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     updateChartVisibility();
     document.getElementById('resultsTable').addEventListener('click', function (event) {

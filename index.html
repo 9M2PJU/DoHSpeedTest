@@ -6,7 +6,7 @@
     <meta name="description"
           content="Experience the only web-based DNS Speed Test. Find the fastest DNS server for your location without any installations or downloads.">
     <meta name="keywords" content="DNS Speed Test, DNS Server, Fast DNS, Internet Speed, DNS Performance">
-    <meta name="author" content="@SilviuStroe">
+    <meta name="author" content="9M2PJU <9m2pju@gmail.com>">
     <title>Fastest DNS Speed Test - Find Optimal DNS Server | No Install</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="index.css">
@@ -32,7 +32,7 @@
             "url": "https://dnsspeedtest.online/",
             "author": {
                 "@type": "Person",
-                "name": "@SilviuStroe"
+                "name": "9M2PJU"
             },
             "applicationCategory": "WebApplication",
             "operatingSystem": "All",
@@ -207,47 +207,38 @@
         <strong>Local Variability:</strong> Network latency and browser load can cause fluctuations. <strong>We recommend running multiple tests</strong> to get a broader performance picture.
     </p>
 </div>
-<footer class="mt-20 py-12 border-t border-white/5 bg-slate-950/30">
-    <div class="max-w-6xl mx-auto px-4">
-        <!-- Support Section -->
+
+<!-- Modal for Top 3 Recommendations -->
+<div id="recommendModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 text-white">
+    <div class="glass-card relative p-10 w-full max-w-4xl shadow-2xl border-white/10 animate-scale-up">
+        <span class="close absolute top-6 right-8 text-4xl font-light text-slate-400 hover:text-white cursor-pointer transition-colors">×</span>
         <div class="text-center mb-10">
-            <p class="text-slate-400 mb-6">
-                🌍 Help keep this benchmark independent and fast
+            <h2 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent mb-4">
+                Optimal Configurations Found
+            </h2>
+            <p class="text-slate-400 text-lg">
+                Based on your current network environment and benchmark data, we recommend these top performers.
             </p>
-
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="https://www.buymeacoffee.com/silviu"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="premium-btn px-6 py-2 text-sm flex items-center gap-2">
-                    <span>☕</span>
-                    <span>Support Project</span>
-                </a>
-
-                <a href="https://www.linkedin.com/in/silviustroe/"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 text-slate-300 text-sm transition-all">
-                    <span>👨🏻‍💻</span>
-                    <span>Hire Author</span>
-                </a>
-            </div>
         </div>
 
-        <!-- GitHub & Copyright -->
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-10 border-t border-white/5">
-            <p class="text-[10px] uppercase tracking-widest font-bold text-slate-500">
-                © 2024-2026 <span class="text-slate-300">DNS.HAMRADIO.MY</span> • By
-                <a href="https://brainic.io" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 transition-colors">Brainic</a>
-            </p>
+        <div id="recommendationCards" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- Dynamic cards inject here -->
+        </div>
 
-            <div class="flex items-center gap-4">
-                <span class="text-[10px] uppercase tracking-widest font-bold text-slate-500">Repository:</span>
-                <a class="github-button" href="https://github.com/BrainicHQ/DoHSpeedTest" data-show-count="true" aria-label="Star on GitHub">Star</a>
-            </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-slate-300">
+            <h3 class="font-bold text-white mb-2 flex items-center gap-2">
+                <span>💡</span> Why these servers?
+            </h3>
+            <p id="recommendationExplanation" class="text-sm leading-relaxed">
+            </p>
+        </div>
+
+        <div class="mt-10 flex justify-center">
+            <button class="premium-btn px-10 py-4 text-lg close-recommend">Acknowledge & Sync</button>
         </div>
     </div>
-</footer>
+</div>
+
 <script async defer src="https://buttons.github.io/buttons.js"></script>
 <script src="script.js"></script>
 </body>
