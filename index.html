@@ -11,7 +11,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="index.css">
     <style>
-        /* Override some tailwind defaults for the premium look */
         .glass-bg {
             background: var(--glass-bg);
             backdrop-filter: var(--glass-blur);
@@ -19,227 +18,153 @@
             border: 1px solid var(--glass-border);
         }
     </style>
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
     <script type="application/ld+json">
         {
             "@context": "http://schema.org",
             "@type": "SoftwareApplication",
             "name": "DNS Speed Test",
-            "description": "Discover the fastest DNS server for your specific location with our advanced DNS Speed Test tool. Enhance your browsing speed and internet reliability effortlessly.",
+            "description": "Discover the fastest DNS server for your specific location with our advanced DNS Speed Test tool.",
             "url": "https://dnsspeedtest.online/",
             "author": {
                 "@type": "Person",
                 "name": "Silviu Stroe (Fork by 9M2PJU)"
             },
             "applicationCategory": "WebApplication",
-            "operatingSystem": "All",
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-            }
+            "operatingSystem": "All"
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
 </head>
-<body class="pt-20 transition-colors duration-300">
-<!-- Background decorative elements -->
-<div class="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
-    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] animate-pulse"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 2s"></div>
-</div>
+<body class="bg-slate-950 text-slate-200 antialiased custom-scrollbar min-h-screen overflow-x-hidden">
+    <div class="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950"></div>
 
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <header class="text-center mb-12 animate-float">
-        <h1 id="cta" class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent cursor-pointer hover:scale-105 transition-transform duration-300">
-            DNS Speed Test
-        </h1>
-        <p class="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Experience lightning-fast DNS benchmarking directly in your browser. Optimize your connection with data-driven insights.
-        </p>
-    </header>
-
-    <div class="flex flex-col items-center gap-8 mb-16">
-        <button id="checkButton" class="premium-btn text-xl px-12 py-4 shadow-2xl">
-            Start Global Benchmark
-        </button>
-        
-        <div id="loadingMessage" class="hidden flex items-center gap-3 text-blue-400 font-medium bg-blue-500/10 px-6 py-3 rounded-full border border-blue-500/20">
-        </div>
-    </div>
-    <div class="glass-card p-6 md:p-8 mb-12 overflow-hidden shadow-2xl border-white/5">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold text-white/90 flex items-center gap-3">
-                <span class="p-2 bg-blue-500/20 rounded-lg text-blue-400">📊</span>
-                Live Benchmarks
-            </h2>
-            <div class="flex gap-4">
-                <button id="editButton" class="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/5 group relative" title="Edit hosts list">
-                    🛠️
+    <div class="max-w-7xl mx-auto px-4 py-4 sm:py-6">
+        <!-- Compact Header -->
+        <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                    <span class="text-blue-500">⚡</span> DNS Speed Test
+                </h1>
+                <p class="text-slate-400 text-xs sm:text-sm">Find your fastest DoH provider in seconds.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="checkButton" class="premium-btn flex items-center gap-2 py-2 px-6 text-sm group">
+                    <span>🚀</span> Run Benchmark
                 </button>
-                <button id="editDoHButton" class="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-white/5 group relative" title="Add DoH servers">
-                    🛡️
-                </button>
+                <div class="flex gap-1.5">
+                    <button id="editButton" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/5 text-sm" title="Edit hosts">
+                        🛠️
+                    </button>
+                    <button id="editDoHButton" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/5 text-sm" title="Add servers">
+                        🛡️
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div id="loadingMessage" class="hidden flex items-center justify-center gap-3 text-blue-400 font-medium bg-blue-500/10 px-4 py-2 rounded-full border border-blue-500/20 mb-4 animate-pulse">
+            <!-- Loading JS will inject specific text here -->
+        </div>
+
+        <!-- Compact Table -->
+        <div class="mb-6">
+            <div id="dnsResults" aria-live="polite" class="overflow-hidden rounded-xl border border-white/10 glass-card">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table id="resultsTable" class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-white/5 border-b border-white/10 uppercase text-[10px] tracking-widest font-bold text-slate-500">
+                                <th class="py-3 px-4">DNS Server</th>
+                                <th onclick="sortTable(1)" class="py-3 px-2 text-center cursor-pointer hover:text-blue-400">Min</th>
+                                <th onclick="sortTable(2)" class="py-3 px-2 text-center cursor-pointer hover:text-blue-400">Median</th>
+                                <th onclick="sortTable(3)" class="py-3 px-2 text-center cursor-pointer hover:text-blue-400">Avg</th>
+                                <th onclick="sortTable(4)" class="py-3 px-2 text-center cursor-pointer hover:text-blue-400">Max</th>
+                                <th onclick="sortTable(5)" class="py-3 px-2 text-center cursor-pointer hover:text-blue-400">Jitter</th>
+                                <th onclick="sortTable(6)" class="py-3 px-4 text-right">Reliability</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody" class="text-slate-300">
+                            <!-- Rows injected by script.js -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div id="dnsResults" aria-live="polite" class="mt-8 overflow-hidden rounded-2xl border border-white/10 glass-card">
-    <div class="overflow-x-auto custom-scrollbar">
-        <table id="resultsTable" class="w-full text-left border-collapse">
-            <thead>
-            <tr class="bg-white/5 border-b border-white/10 uppercase text-[10px] tracking-widest font-bold text-slate-400">
-                <th class="py-4 px-6">DNS Server</th>
-                <th onclick="sortTable(1)" class="py-4 px-4 text-center cursor-pointer hover:text-blue-400 transition-colors">Min (ms) ↓</th>
-                <th onclick="sortTable(2)" class="py-4 px-4 text-center cursor-pointer hover:text-blue-400 transition-colors">Median (ms) ↓</th>
-                <th onclick="sortTable(3)" class="py-4 px-4 text-center cursor-pointer hover:text-blue-400 transition-colors">Avg (ms) ↓</th>
-                <th onclick="sortTable(4)" class="py-4 px-4 text-center cursor-pointer hover:text-blue-400 transition-colors">Max (ms) ↓</th>
-                <th onclick="sortTable(5)" class="py-4 px-4 text-center cursor-pointer hover:text-blue-400 transition-colors tooltip">
-                    Jitter (ms) ↓
-                    <span class="tooltiptext">Response time variation</span>
-                </th>
-                <th onclick="sortTable(6)" class="py-4 px-6 text-right">Reliability</th>
-            </tr>
-            </thead>
-            <tbody id="resultsBody" class="text-slate-300 font-medium">
-            <!-- Dynamic rows -->
-            </tbody>
-        </table>
-    </div>
-</div>
-    </div>
-
-    <!-- Charts Section -->
-    <div id="chartSection" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 hidden">
-        <div class="glass-card p-6 border-white/5">
-            <h3 class="text-xl font-bold mb-6 text-white/90 flex items-center gap-3">
-                <span class="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">📈</span>
-                Average Latency
-            </h3>
-            <div id="chartContainer" class="h-[400px]">
-                <canvas id="dnsChart"></canvas>
+        <!-- Compact Charts -->
+        <div id="chartSection" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 hidden">
+            <div class="glass-card p-3 border-white/5">
+                <h3 class="text-sm font-bold mb-2 text-white/80 flex items-center gap-2">
+                    <span class="text-emerald-400">📈</span> Latency
+                </h3>
+                <div class="h-[200px] w-full">
+                    <canvas id="dnsChart"></canvas>
+                </div>
+            </div>
+            <div class="glass-card p-3 border-white/5">
+                <h3 class="text-sm font-bold mb-2 text-white/80 flex items-center gap-2">
+                    <span class="text-purple-400">🎯</span> Jitter
+                </h3>
+                <div class="h-[200px] w-full">
+                    <canvas id="dnsJitterChart"></canvas>
+                </div>
             </div>
         </div>
-        <div class="glass-card p-6 border-white/5">
-            <h3 class="text-xl font-bold mb-6 text-white/90 flex items-center gap-3">
-                <span class="p-2 bg-purple-500/20 rounded-lg text-purple-400">🎯</span>
-                Consistency & Jitter
-            </h3>
-            <div id="jitterChartContainer" class="h-[400px]">
-                <canvas id="dnsJitterChart"></canvas>
+    </div>
+
+    <!-- Modals (Hidden by default) -->
+    <div id="websiteModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4">
+        <div class="glass-card relative p-6 w-full max-w-lg border-white/10">
+            <span class="close absolute top-3 right-4 text-2xl font-light text-slate-400 hover:text-white cursor-pointer">×</span>
+            <h2 class="text-xl font-bold mb-1 text-white">Edit Test Hosts</h2>
+            <p class="text-xs text-slate-400 mb-4">Customize the domains used for benchmarking.</p>
+            <div class="overflow-auto max-h-[30vh] mb-4 custom-scrollbar">
+                <ul id="websiteList" class="space-y-1.5"></ul>
             </div>
-<!-- Modal for editing DNS test hosts -->
-<div id="websiteModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-    <div class="glass-card relative p-8 w-full max-w-2xl shadow-2xl border-white/10">
-        <span class="close absolute top-4 right-4 text-3xl font-light text-slate-400 hover:text-white cursor-pointer transition-colors">×</span>
-        <h2 class="text-3xl font-bold mb-2 text-white/90">Edit Test Hosts</h2>
-        <p class="mb-6 text-slate-400 leading-relaxed">
-            Add or remove hostnames to tailor your benchmark. Use services you visit frequently for the most accurate results.
-        </p>
-        <div class="overflow-auto max-h-[40vh] mb-6 custom-scrollbar">
-            <ul id="websiteList" class="space-y-2">
-                <!-- Dynamic list items -->
-            </ul>
-        </div>
-        <div class="flex gap-3">
-            <input type="text" id="newWebsite"
-                   class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-                   placeholder="e.g. example.com">
-            <button id="addHostname" class="premium-btn px-6 py-3">Add Host</button>
+            <div class="flex gap-2">
+                <input type="text" id="newWebsite" class="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50" placeholder="e.g. google.com">
+                <button id="addHostname" class="premium-btn py-2 px-4 text-sm">Add</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Modal for adding new DoH servers -->
-<div id="dohModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-    <div class="glass-card relative p-8 w-full max-w-2xl shadow-2xl border-white/10">
-        <span class="close absolute top-4 right-4 text-3xl font-light text-slate-400 hover:text-white cursor-pointer transition-colors">×</span>
-        <h2 class="text-3xl font-bold mb-2 text-white/90">Custom DoH Servers</h2>
-        <p class="mb-6 text-slate-400 leading-relaxed">
-            Expand the benchmark by adding custom DNS-over-HTTPS (DoH) endpoints.
-        </p>
-        <div class="overflow-auto max-h-[40vh] mb-6 custom-scrollbar">
-            <ul id="dohList" class="space-y-2">
-                <!-- Dynamic list items -->
-            </ul>
-        </div>
-        <div class="flex flex-col gap-3">
-            <input type="url" id="newDoH"
-                   class="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-                   placeholder="Format: Name, https://url/dns-query">
-            <button id="addDoH" class="premium-btn w-full py-3">Register Server</button>
+    <div id="dohModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4">
+        <div class="glass-card relative p-6 w-full max-w-lg border-white/10">
+            <span class="close absolute top-3 right-4 text-2xl font-light text-slate-400 hover:text-white cursor-pointer">×</span>
+            <h2 class="text-xl font-bold mb-1 text-white">Custom DoH Servers</h2>
+            <p class="text-xs text-slate-400 mb-4">Add your own DNS-over-HTTPS endpoints.</p>
+            <div class="overflow-auto max-h-[30vh] mb-4 custom-scrollbar">
+                <ul id="dohList" class="space-y-1.5"></ul>
+            </div>
+            <div class="flex flex-col gap-2">
+                <input type="url" id="newDoH" class="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50" placeholder="Format: Name, https://url/dns-query">
+                <button id="addDoH" class="premium-btn w-full py-2 text-sm">Register Server</button>
+            </div>
         </div>
     </div>
-</div>
-    </div>
-</div>
-<!-- No duplicate chartContainer here -->
-<div id="disclaimer" class="mt-20 p-8 glass-card border-white/5 max-w-6xl mx-auto leading-relaxed space-y-6 text-slate-400">
-    <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent mb-6">Disclaimer</h2>
 
-    <p>
-        This <strong>DNS Speed Test tool</strong> runs entirely in your browser, sending live DNS-over-HTTPS (DoH)
-        queries from your local environment. No server-side code is involved, and no personal data is collected. By
-        measuring directly from your current network, the tool aims to provide <strong>accurate, real-world
-        results</strong>.
-    </p>
-
-    <p>
-        <strong>Warm-Up Phase:</strong> Before timing each DNS server, the script primes connections and caches to
-        minimize the overhead of TCP/TLS handshakes. This warm-up step helps ensure consistent, ready-to-go conditions
-        when actual measurements begin.
-    </p>
-
-    <p>
-        <strong>Time Measurement:</strong> We use the browser’s <code>fetch</code> and <code>performance.now()</code> APIs. 
-        Because this includes HTTP/TLS overhead, results may be higher than raw DNS queries. Depending on server capabilities, 
-        we use <code>GET</code> or <code>POST</code>.
-    </p>
-
-    <p>
-        <strong>Timeouts:</strong> Each query times out after 5 seconds to ensure the benchmark proceeds efficiently.
-    </p>
-
-    <p>
-        <strong>Local Variability:</strong> Network latency and browser load can cause fluctuations. <strong>We recommend running multiple tests</strong> to get a broader performance picture.
-    </p>
-</div>
-
-<!-- Modal for Top 3 Recommendations -->
-<div id="recommendModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 text-white">
-    <div class="glass-card relative p-10 w-full max-w-4xl shadow-2xl border-white/10 animate-scale-up">
-        <span class="close absolute top-6 right-8 text-4xl font-light text-slate-400 hover:text-white cursor-pointer transition-colors">×</span>
-        <div class="text-center mb-10">
-            <h2 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent mb-4">
-                Optimal Configurations Found
-            </h2>
-            <p class="text-slate-400 text-lg">
-                Based on your current network environment and benchmark data, we recommend these top performers.
-            </p>
-        </div>
-
-        <div id="recommendationCards" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <!-- Dynamic cards inject here -->
-        </div>
-
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-6 text-slate-300">
-            <h3 class="font-bold text-white mb-2 flex items-center gap-2">
-                <span>💡</span> Why these servers?
-            </h3>
-            <p id="recommendationExplanation" class="text-sm leading-relaxed">
-            </p>
-        </div>
-
-        <div class="mt-10 flex justify-center">
-            <button class="premium-btn px-10 py-4 text-lg close-recommend">Acknowledge & Sync</button>
+    <div id="recommendModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+        <div class="glass-card relative p-8 w-full max-w-3xl border-white/10 animate-scale-up">
+            <span class="close absolute top-4 right-6 text-3xl font-light text-slate-400 hover:text-white cursor-pointer">×</span>
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-white mb-2">Optimal Configs Found</h2>
+                <p class="text-slate-400 text-sm">Top results based on your current network path.</p>
+            </div>
+            <div id="recommendationCards" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"></div>
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-slate-300 text-sm">
+                <h3 class="font-bold text-white mb-1 flex items-center gap-2">💡 Performance Summary</h3>
+                <p id="recommendationExplanation"></p>
+            </div>
+            <div class="mt-6 flex justify-center">
+                <button class="premium-btn px-8 py-3 text-sm close-recommend">Acknowledge</button>
+            </div>
         </div>
     </div>
-</div>
 
-<script async defer src="https://buttons.github.io/buttons.js"></script>
-<script src="script.js"></script>
+    <div id="disclaimer" class="mt-12 p-6 glass-card border-white/5 max-w-5xl mx-auto text-xs text-slate-500 leading-relaxed">
+        <h2 class="text-sm font-bold text-white mb-2 uppercase tracking-wider">How it works</h2>
+        <p>This tool runs entirely in your browser using <code>fetch</code> and <code>performance.now()</code>. It performs a warm-up phase to eliminate TLS handshake overhead, providing a realistic view of recursive resolution speed.</p>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

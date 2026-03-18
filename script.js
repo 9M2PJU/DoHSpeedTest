@@ -252,11 +252,9 @@ checkButton.addEventListener('click', async function () {
     const chartSection = document.getElementById('chartSection');
     chartSection.classList.add('hidden');
 
-    // Focus on charts immediately if they were visible, or prepare to show them
-    window.scrollTo({
-        top: document.getElementById('checkButton').offsetTop + 100,
-        behavior: 'smooth'
-    });
+    // In compact mode, we might not need scrolling if everything fits
+    // but we can ensure the results are visible
+    document.getElementById('dnsResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     await updateLoadingMessage('Initializing Warm-up Phase');
     await warmUpDNSServers();
