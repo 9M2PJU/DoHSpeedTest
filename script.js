@@ -1,6 +1,7 @@
 /*
  * DoHSpeedTest - Real-time DNS over HTTPS (DoH) Speed Testing Tool
  * Copyright (C) 2023 Silviu Stroe
+ * Fork Maintained by 9M2PJU <9m2pju@gmail.com> (2026)
  *
  * This file is part of DoHSpeedTest.
  *

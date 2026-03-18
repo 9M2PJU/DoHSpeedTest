@@ -54,7 +54,8 @@ our [issues page](https://github.com/BrainicHQ/DoHSpeedTest/issues).
 
 ## 👤 Author
 
-- [9M2PJU](mailto:9m2pju@gmail.com) - Creator and project maintainer.
+- [Silviu Stroe](https://github.com/s1lviu/) - Creator and original project maintainer.
+- [9M2PJU](mailto:9m2pju@gmail.com) - Fork maintainer and UI/Feature enhancements.
 
 ## ⭐ Support
 
