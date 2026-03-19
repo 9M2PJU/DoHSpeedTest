@@ -7,9 +7,8 @@
  */
 
 // Global state and Constants
-const topWebsites = ['google.com', 'youtube.com', 'facebook.com', 'instagram.com', 'chatgpt.com', 'x.com', 'whatsapp.com', 'reddit.com', 'wikipedia.org', 'amazon.com', 'tiktok.com', 'pinterest.com'];
-const TIMEOUT_PENALTY_MS = 5000;
-let dnsServers = [
+const DEFAULT_WEBSITES = ['google.com', 'youtube.com', 'facebook.com', 'instagram.com', 'chatgpt.com', 'x.com', 'whatsapp.com', 'reddit.com', 'wikipedia.org', 'amazon.com', 'tiktok.com', 'pinterest.com'];
+const DEFAULT_SERVERS = [
     { name: "AdGuard", url: "https://dns.adguard-dns.com/dns-query", ips: ["94.140.14.14", "94.140.15.15"] },
     { name: "AliDNS", url: "https://dns.alidns.com/dns-query", ips: ["223.5.5.5", "223.6.6.6"] },
     { name: "OpenDNS", url: "https://doh.opendns.com/dns-query", ips: ["208.67.222.222", "208.67.220.220"] },
@@ -25,8 +24,18 @@ let dnsServers = [
     { name: "RethinkDNS", url: "https://sky.rethinkdns.com/dns-query", ips: ["104.21.83.62"], allowCors: false }
 ];
 
+let topWebsites = JSON.parse(localStorage.getItem('DOH_SPEEDTEST_WEBSITES')) || DEFAULT_WEBSITES;
+let dnsServers = JSON.parse(localStorage.getItem('DOH_SPEEDTEST_SERVERS')) || DEFAULT_SERVERS;
+
 let dnsChart, jitterChart;
 let chartData = [];
+
+function saveToLocalStorage() {
+    localStorage.setItem('DOH_SPEEDTEST_WEBSITES', JSON.stringify(topWebsites));
+    // Save configuration only, excluding benchmark results
+    const serversToSave = dnsServers.map(({ name, url, ips, type, allowCors }) => ({ name, url, ips, type, allowCors }));
+    localStorage.setItem('DOH_SPEEDTEST_SERVERS', JSON.stringify(serversToSave));
+}
 
 // Helper functions
 const closeModal = (id) => document.getElementById(id)?.classList.add('hidden');
@@ -157,31 +166,44 @@ function calculateStats(results) {
 function updateResultRow(s) {
     const body = document.getElementById('resultsBody');
     if (!body) return;
-    let row = document.querySelector(`tr[data-name="${s.name}"]`);
-    if (!row) {
-        row = document.createElement('tr');
-        row.setAttribute('data-name', s.name);
-        row.className = 'border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group';
-        body.appendChild(row);
-    }
     
-    row.innerHTML = `
-        <td class="py-3 px-4 font-bold">${s.name}</td>
-        <td class="py-3 px-2 text-center text-slate-400">${s.speed.min.toFixed(1)}</td>
-        <td class="py-3 px-2 text-center text-blue-400 font-bold">${s.speed.median.toFixed(1)}</td>
-        <td class="py-3 px-2 text-center text-slate-400">${s.speed.avg.toFixed(1)}</td>
-        <td class="py-3 px-2 text-center text-slate-400">${s.speed.max.toFixed(1)}</td>
-        <td class="py-3 px-2 text-center text-purple-400">${s.speed.jitter.toFixed(1)}</td>
-        <td class="py-3 px-4 text-right">
-            <span class="px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${s.reliability === 'healthy' ? 'bg-emerald-500/10 text-emerald-500' : (s.reliability === 'partial' ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500')}">
-                ${s.reliability}
-            </span>
-        </td>
-    `;
-    
+    // Update chartData for visualization
     const serverInfo = { name: s.name, avg: s.speed.avg, min: s.speed.min, max: s.speed.max, jitter: s.speed.jitter };
-    const idx = chartData.findIndex(c => c.name === s.name);
-    if (idx === -1) chartData.push(serverInfo); else chartData[idx] = serverInfo;
+    const chartIdx = chartData.findIndex(c => c.name === s.name);
+    if (chartIdx === -1) chartData.push(serverInfo); else chartData[chartIdx] = serverInfo;
+    
+    // Sort all tested servers by reliability first (HEALTHY/PARTIAL before FAILED), then by their Minimum latency (fastest first)
+    const testedServers = dnsServers
+        .filter(server => server.speed && server.speed.min !== undefined)
+        .sort((a, b) => {
+            const getRank = (s) => (s.reliability === 'failed' ? 1 : 0);
+            const rankA = getRank(a);
+            const rankB = getRank(b);
+            
+            if (rankA !== rankB) return rankA - rankB;
+            return a.speed.min - b.speed.min;
+        });
+    
+    // Clear and re-render the entire table body to maintain sorted order
+    body.innerHTML = testedServers.map(server => `
+        <tr data-name="${server.name}" class="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group">
+            <td class="py-3 px-4 font-bold text-white">${server.name}</td>
+            <td class="py-3 px-2 text-center text-emerald-400 font-bold">${server.speed.min.toFixed(1)}</td>
+            <td class="py-3 px-2 text-center text-blue-400 font-medium">${server.speed.median.toFixed(1)}</td>
+            <td class="py-3 px-2 text-center text-slate-400">${server.speed.avg.toFixed(1)}</td>
+            <td class="py-3 px-2 text-center text-slate-400">${server.speed.max.toFixed(1)}</td>
+            <td class="py-3 px-2 text-center text-purple-400">${server.speed.jitter.toFixed(1)}</td>
+            <td class="py-3 px-4 text-right">
+                <span class="px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
+                    server.reliability === 'healthy' ? 'bg-emerald-500/10 text-emerald-500' : 
+                    (server.reliability === 'partial' ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500')
+                }">
+                    ${server.reliability}
+                </span>
+            </td>
+        </tr>
+    `).join('');
+    
     updateCharts();
 }
 
@@ -225,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         websiteList.innerHTML = topWebsites.map((site, i) => `
             <li class="flex justify-between items-center p-2 bg-white/5 rounded-lg mb-1 group">
                 <span class="text-sm">${site}</span>
-                <button onclick="topWebsites.splice(${i},1); window.renderWebsites();" class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity">
+                <button onclick="topWebsites.splice(${i},1); saveToLocalStorage(); window.renderWebsites();" class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </li>
@@ -241,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="text-sm font-medium">${s.name}</span>
                     <span class="text-[10px] text-slate-500 truncate max-w-[180px]">${s.url}</span>
                 </div>
-                <button onclick="dnsServers.splice(${i},1); window.renderServers();" class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity">
+                <button onclick="dnsServers.splice(${i},1); saveToLocalStorage(); window.renderServers();" class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 transition-opacity">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </li>
@@ -297,6 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('newWebsite');
         if (input?.value && !topWebsites.includes(input.value)) {
             topWebsites.push(input.value);
+            saveToLocalStorage();
             input.value = '';
             renderWebsites();
         }
@@ -308,6 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const parts = input.value.split(',').map(p => p.trim());
             if (parts.length >= 2) {
                 dnsServers.push({ name: parts[0], url: parts[1], ips: [] });
+                saveToLocalStorage();
                 input.value = '';
                 renderServers();
             } else {
